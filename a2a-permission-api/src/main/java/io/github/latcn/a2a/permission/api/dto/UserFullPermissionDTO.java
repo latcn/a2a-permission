@@ -1,12 +1,16 @@
 package io.github.latcn.a2a.permission.api.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.*;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserFullPermissionDTO {
 
     private Long userId;
@@ -17,5 +21,6 @@ public class UserFullPermissionDTO {
     private String combinedVersion;
     private Long userPermVersion;
     private Map<Long, Long> roleVersions;
+    private List<String> departmentPath;
 
 }

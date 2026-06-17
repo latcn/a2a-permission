@@ -78,20 +78,9 @@
             </dependency>
             <dependency>
                 <groupId>io.github.latcn</groupId>
-                <artifactId>a2a-permission-local-client</artifactId>
+                <artifactId>a2a-permission-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>io.github.latcn</groupId>
-                <artifactId>a2a-permission-common-client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.latcn</groupId>
-                <artifactId>a2a-permission-remote-client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- ==================== MyBatis-Plus Spring Boot 3 ==================== -->
             <dependency>
                 <groupId>com.baomidou</groupId>

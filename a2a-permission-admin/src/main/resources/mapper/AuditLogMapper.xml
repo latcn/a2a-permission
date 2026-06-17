@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.latcn.a2a.permission.admin.mapper.AuditLogMapper">
+
+    <resultMap id="BaseResultMap" type="io.github.latcn.a2a.permission.admin.entity.AuditLog">
+        <id column="id" property="id"/>
+        <result column="trace_id" property="traceId"/>
+        <result column="operation_type" property="operationType"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="target_user_id" property="targetUserId"/>
+        <result column="target_role_id" property="targetRoleId"/>
+        <result column="target_permission_id" property="targetPermissionId"/>
+        <result column="target_client_id" property="targetClientId"/>
+        <result column="operation_detail" property="operationDetail" 
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="operation_result" property="operationResult"/>
+        <result column="client_ip" property="clientIp"/>
+        <result column="user_agent" property="userAgent"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+</mapper>

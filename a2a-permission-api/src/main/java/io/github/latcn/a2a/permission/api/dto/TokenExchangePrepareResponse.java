@@ -1,13 +1,17 @@
 package io.github.latcn.a2a.permission.api.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.management.relation.RoleInfo;
 import java.util.*;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenExchangePrepareResponse {
     private Long userId;
     private String username;

@@ -1,4 +1,4 @@
-package io.github.latcn.a2a.permission.api.spi;
+package io.github.latcn.a2a.permission.api.service;
 
 import io.github.latcn.a2a.permission.api.dto.*;
 
