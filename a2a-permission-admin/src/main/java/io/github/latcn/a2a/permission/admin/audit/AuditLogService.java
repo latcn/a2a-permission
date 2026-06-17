@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -38,6 +40,9 @@ public class AuditLogService {
             auditLog.setOperatorId(dto.getOperatorId());
             auditLog.setTargetUserId(dto.getTargetUserId());
             auditLog.setTargetRoleId(dto.getTargetRoleId());
+            auditLog.setTargetPermissionId(dto.getTargetPermissionId());
+            auditLog.setTargetClientId(dto.getTargetClientId());
+            auditLog.setOperationDetail(dto.getOperationDetail());
             auditLog.setClientIp(dto.getClientIp());
             auditLog.setUserAgent(dto.getUserAgent());
             auditLog.setCreatedAt(LocalDateTime.now());
@@ -52,6 +57,7 @@ public class AuditLogService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public AuditDiff computeDiff(OperationType type, Object before, Object after) {
         if (type == OperationType.ROLE_GRANT || type == OperationType.ROLE_REVOKE) {
             return computeRoleGrantDiff(type, before, after);
@@ -63,16 +69,63 @@ public class AuditLogService {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     private RoleGrantDiff computeRoleGrantDiff(OperationType type, Object before, Object after) {
-        return null;
+        try {
+            Map<String, Object> beforeMap = (Map<String, Object>) before;
+            Map<String, Object> afterMap = (Map<String, Object>) after;
+
+            Long operatorId = ((Number) beforeMap.get("operatorId")).longValue();
+            Long roleId = ((Number) beforeMap.get("roleId")).longValue();
+            String roleName = (String) beforeMap.get("roleName");
+            boolean grant = (Boolean) afterMap.get("grant");
+            Set<Long> targetUserIds = (Set<Long>) afterMap.get("targetUserIds");
+
+            return new RoleGrantDiff(operatorId, roleId, roleName, targetUserIds, grant);
+        } catch (Exception e) {
+            log.warn("Failed to compute role grant diff", e);
+            return null;
+        }
     }
 
+    @SuppressWarnings("unchecked")
     private PermGrantDiff computePermGrantDiff(OperationType type, Object before, Object after) {
-        return null;
+        try {
+            Map<String, Object> beforeMap = (Map<String, Object>) before;
+            Map<String, Object> afterMap = (Map<String, Object>) after;
+
+            Long operatorId = ((Number) beforeMap.get("operatorId")).longValue();
+            Long roleId = ((Number) beforeMap.get("roleId")).longValue();
+            String roleName = (String) beforeMap.get("roleName");
+            boolean grant = (Boolean) afterMap.get("grant");
+            Set<Long> targetPermissionIds = (Set<Long>) afterMap.get("targetPermissionIds");
+
+            return new PermGrantDiff(operatorId, roleId, roleName, targetPermissionIds, grant);
+        } catch (Exception e) {
+            log.warn("Failed to compute perm grant diff", e);
+            return null;
+        }
     }
 
+    @SuppressWarnings("unchecked")
     private RowRuleUpdateDiff computeRowRuleUpdateDiff(Object before, Object after) {
-        return null;
+        try {
+            Map<String, Object> beforeMap = (Map<String, Object>) before;
+            Map<String, Object> afterMap = (Map<String, Object>) after;
+
+            Long operatorId = ((Number) beforeMap.get("operatorId")).longValue();
+            Long roleId = ((Number) beforeMap.get("roleId")).longValue();
+            String roleName = (String) beforeMap.get("roleName");
+            Long permissionId = ((Number) beforeMap.get("permissionId")).longValue();
+            String permissionCode = (String) beforeMap.get("permissionCode");
+            String oldRowRule = (String) afterMap.get("oldRowRule");
+            String newRowRule = (String) afterMap.get("newRowRule");
+
+            return new RowRuleUpdateDiff(operatorId, roleId, roleName, permissionId, permissionCode, oldRowRule, newRowRule);
+        } catch (Exception e) {
+            log.warn("Failed to compute row rule update diff", e);
+            return null;
+        }
     }
 
     private String toJson(Object obj) {

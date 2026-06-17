@@ -20,4 +20,8 @@
         <result column="updated_at" property="updatedAt"/>
     </resultMap>
 
+    <select id="selectByClientId" resultMap="BaseResultMap">
+        SELECT * FROM t_agent WHERE client_id = #{clientId} LIMIT 1
+    </select>
+
 </mapper>

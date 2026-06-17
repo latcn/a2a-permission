@@ -6,12 +6,18 @@
         <id column="id" property="id"/>
         <result column="source_client_id" property="sourceClientId"/>
         <result column="target_client_id" property="targetClientId"/>
-        <result column="allowed_scopes" property="allowedScopes" 
+        <result column="allowed_scopes" property="allowedScopes"
                 typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="created_by" property="createdBy"/>
         <result column="updated_by" property="updatedBy"/>
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>
     </resultMap>
+
+    <select id="selectBySourceAndTarget" resultMap="BaseResultMap">
+        SELECT * FROM t_a2a_acl
+        WHERE source_client_id = #{sourceClientId} AND target_client_id = #{targetClientId}
+        LIMIT 1
+    </select>
 
 </mapper>

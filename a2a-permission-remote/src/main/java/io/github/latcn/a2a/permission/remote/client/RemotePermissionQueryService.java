@@ -5,7 +5,7 @@ import io.github.latcn.a2a.permission.api.dto.AgentDTO;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareRequest;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareResponse;
 import io.github.latcn.a2a.permission.api.dto.UserFullPermissionDTO;
-import io.github.latcn.a2a.permission.remote.fallback.PermissionQueryFallback;
+import io.github.latcn.a2a.permission.remote.fallback.PermissionQueryFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
     name = "a2a-permission-service",
-    fallback = PermissionQueryFallback.class
+    fallbackFactory = PermissionQueryFallbackFactory.class
 )
 public interface RemotePermissionQueryService {
 

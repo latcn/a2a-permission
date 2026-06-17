@@ -14,14 +14,14 @@ import java.util.Set;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/permission")
 @RequiredArgsConstructor
 public class PermissionController {
 
     private final PermissionAdminService permissionAdminService;
     private final PermissionQueryService permissionQueryService;
 
-    @GetMapping("/users/{userId}/permissions")
+    @GetMapping("/user/{userId}/full-permissions")
     public ResponseEntity<UserFullPermissionDTO> getUserPermissions(@PathVariable Long userId) {
         log.info("Getting permissions for user: {}", userId);
         UserFullPermissionDTO result = permissionAdminService.getUserFullPermissions(userId);
@@ -31,7 +31,7 @@ public class PermissionController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/token/exchange/prepare")
+    @PostMapping("/token-exchange/prepare")
     public ResponseEntity<TokenExchangePrepareResponse> prepareTokenExchange(
             @Valid @RequestBody TokenExchangePrepareRequest request) {
         log.info("Preparing token exchange: {}", request);
@@ -39,7 +39,7 @@ public class PermissionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/agents/{clientId}")
+    @GetMapping("/agent/{clientId}")
     public ResponseEntity<AgentDTO> getAgent(@PathVariable String clientId) {
         log.info("Getting agent for clientId: {}", clientId);
         AgentDTO agent = permissionQueryService.getAgent(clientId);
@@ -49,10 +49,10 @@ public class PermissionController {
         return ResponseEntity.ok(agent);
     }
 
-    @GetMapping("/acl/check")
+    @GetMapping("/acl/{sourceClientId}/{targetClientId}")
     public ResponseEntity<AclCheckResult> checkAcl(
-            @RequestParam String sourceClientId,
-            @RequestParam String targetClientId) {
+            @PathVariable String sourceClientId,
+            @PathVariable String targetClientId) {
         log.info("Checking ACL from {} to {}", sourceClientId, targetClientId);
         AclCheckResult result = permissionQueryService.checkAcl(sourceClientId, targetClientId);
         return ResponseEntity.ok(result);

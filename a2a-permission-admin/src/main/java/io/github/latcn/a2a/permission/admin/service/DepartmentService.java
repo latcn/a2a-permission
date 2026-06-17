@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +24,59 @@ public class DepartmentService {
     private final DepartmentMapper departmentMapper;
     private final RedissonClient redissonClient;
 
-    private static final String LOCK_PREFIX = "department:lock:";
+    private static final String DEPT_PATH_LOCK_PREFIX = "dept:path:lock:";
+    private static final int BATCH_SIZE = 1000;
+
+    @Transactional
+    public Department createDepartment(Department department) {
+        if (department.getParentId() != null) {
+            departmentMapper.selectForUpdate(department.getParentId());
+        }
+        departmentMapper.insert(department);
+
+        String parentPath = department.getParentId() == null ? "" : departmentMapper.selectPath(department.getParentId());
+        String currentPath = parentPath + "/" + department.getId();
+        departmentMapper.updateParentAndPath(department.getId(), department.getParentId(), currentPath);
+
+        return departmentMapper.selectById(department.getId());
+    }
+
+    @Transactional
+    public void moveDepartment(Long deptId, Long newParentId) {
+        String lockKey = DEPT_PATH_LOCK_PREFIX + deptId;
+        RLock lock = redissonClient.getLock(lockKey);
+        try {
+            if (!lock.tryLock(5, 10, TimeUnit.SECONDS)) {
+                throw new ConcurrentModificationException("部门正在被其他操作修改");
+            }
+
+            String oldPath = departmentMapper.selectPath(deptId);
+            String newParentPath = newParentId == null ? "" : departmentMapper.selectPath(newParentId);
+            String newPath = newParentPath + "/" + deptId;
+
+            departmentMapper.updateParentAndPath(deptId, newParentId, newPath);
+
+            String oldPrefix = oldPath + "/";
+            String newPrefix = newPath + "/";
+            int offset = 0;
+            while (true) {
+                List<Long> childIds = departmentMapper.selectSubDeptIdsByPath(oldPrefix);
+                if (childIds.isEmpty()) break;
+                for (int i = 0; i < childIds.size(); i += BATCH_SIZE) {
+                    List<Long> batch = childIds.subList(i, Math.min(i + BATCH_SIZE, childIds.size()));
+                    departmentMapper.batchCascadeUpdatePath(batch, oldPrefix, newPrefix);
+                }
+                offset += BATCH_SIZE;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("获取分布式锁被中断", e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
 
     @Transactional
     public Department create(Department department) {
@@ -58,7 +111,7 @@ public class DepartmentService {
 
     @Transactional
     public Department update(Long id, Department department) {
-        RLock lock = redissonClient.getLock(LOCK_PREFIX + id);
+        RLock lock = redissonClient.getLock(DEPT_PATH_LOCK_PREFIX + id);
         try {
             lock.lock(10, TimeUnit.SECONDS);
 
@@ -117,7 +170,7 @@ public class DepartmentService {
 
     @Transactional
     public void delete(Long id) {
-        RLock lock = redissonClient.getLock(LOCK_PREFIX + id);
+        RLock lock = redissonClient.getLock(DEPT_PATH_LOCK_PREFIX + id);
         try {
             lock.lock(10, TimeUnit.SECONDS);
 

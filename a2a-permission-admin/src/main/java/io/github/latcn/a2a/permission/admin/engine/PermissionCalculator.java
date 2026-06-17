@@ -31,6 +31,7 @@ public class PermissionCalculator {
     private final RowRuleMerger rowRuleMerger;
     private final WildcardExpander wildcardExpander;
     private final MandatoryRuleInjector mandatoryRuleInjector;
+    private final ExpressionOptimizer expressionOptimizer;
     private final CombinedVersionCalculator combinedVersionCalculator;
     private final UserContextEnricher userContextEnricher;
 
@@ -80,7 +81,15 @@ public class PermissionCalculator {
         Map<Long, Long> roleVersions = roles.stream()
                 .collect(Collectors.toMap(Role::getId, Role::getRoleVersion));
 
-        mandatoryRuleInjector.inject(allPermissions, allRowRules);
+        Map<String, String> optimizedRowRules = expressionOptimizer.optimize(allRowRules);
+
+        Map<String, String> finalRowRules = new HashMap<>();
+        for (Map.Entry<String, String> entry : optimizedRowRules.entrySet()) {
+            String permCode = entry.getKey();
+            String rule = entry.getValue();
+            String injected = mandatoryRuleInjector.inject(rule, permCode);
+            finalRowRules.put(permCode, injected);
+        }
 
         String combinedVersion = combinedVersionCalculator.calculate(user.getPermVersion(), roleVersions);
 
@@ -96,7 +105,7 @@ public class PermissionCalculator {
                 .userId(userId)
                 .username(user.getUsername())
                 .permissions(allPermissions)
-                .rowRules(allRowRules)
+                .rowRules(finalRowRules)
                 .roles(roleInfos)
                 .combinedVersion(combinedVersion)
                 .userPermVersion(user.getPermVersion())

@@ -6,10 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RedisCacheManager {
+
+    private static final String DEPT_SUB_CACHE_PREFIX = "dept:sub:";
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
@@ -27,7 +30,7 @@ public class RedisCacheManager {
         }
         try {
             String jsonValue = objectMapper.writeValueAsString(value);
-            redisTemplate.opsForValue().set(key, jsonValue, 
+            redisTemplate.opsForValue().set(key, jsonValue,
                     cacheConfig.getRedisExpireHours(), TimeUnit.HOURS);
             log.debug("Set cache key: {}", key);
         } catch (JsonProcessingException e) {
@@ -107,5 +110,15 @@ public class RedisCacheManager {
 
     public StringRedisTemplate getRedisTemplate() {
         return redisTemplate;
+    }
+
+    public List<Long> getDeptSubIds(Long deptId) {
+        String key = DEPT_SUB_CACHE_PREFIX + deptId;
+        return get(key, List.class);
+    }
+
+    public void setDeptSubIds(Long deptId, List<Long> subIds) {
+        String key = DEPT_SUB_CACHE_PREFIX + deptId;
+        set(key, subIds);
     }
 }

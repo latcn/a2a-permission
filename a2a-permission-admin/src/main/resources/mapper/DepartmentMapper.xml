@@ -19,4 +19,31 @@
         SELECT * FROM t_department WHERE path LIKE CONCAT(#{pathPrefix}, '%')
     </select>
 
+    <select id="selectForUpdate" resultMap="BaseResultMap">
+        SELECT * FROM t_department WHERE id = #{id} FOR UPDATE
+    </select>
+
+    <select id="selectSubDeptIdsByPath" resultType="java.lang.Long">
+        SELECT id FROM t_department WHERE path LIKE CONCAT(#{path}, '/%')
+    </select>
+
+    <update id="batchCascadeUpdatePath">
+        UPDATE t_department
+        SET path = REPLACE(path, #{oldPrefix}, #{newPrefix})
+        WHERE id IN
+        <foreach collection="childIds" item="childId" open="(" separator="," close=")">
+            #{childId}
+        </foreach>
+    </update>
+
+    <update id="updateParentAndPath">
+        UPDATE t_department
+        SET parent_id = #{parentId}, path = #{path}, updated_at = CURRENT_TIMESTAMP(6)
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectPath" resultType="java.lang.String">
+        SELECT path FROM t_department WHERE id = #{id}
+    </select>
+
 </mapper>

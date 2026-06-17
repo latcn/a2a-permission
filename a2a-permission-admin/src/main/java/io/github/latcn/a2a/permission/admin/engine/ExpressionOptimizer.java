@@ -15,6 +15,10 @@ public class ExpressionOptimizer {
     private static final Pattern TRUE_PATTERN = Pattern.compile("^(1\\s*=\\s*1|true|TRUE)$");
     private static final Pattern FALSE_PATTERN = Pattern.compile("^(1\\s*=\\s*0|false|FALSE)$");
 
+    public Map<String, String> optimize(Map<String, String> allRowRules){
+        return null;
+    }
+
     public String optimize(String expression) {
         if (expression == null || expression.isEmpty()) {
             return expression;

@@ -1,31 +1,37 @@
 package io.github.latcn.a2a.permission.admin.engine;
 
+import io.github.latcn.a2a.permission.admin.entity.Permission;
+import io.github.latcn.a2a.permission.admin.mapper.PermissionMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Map;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MandatoryRuleInjector {
 
-    private static final String MANDATORY_ROLE = "system:mandatory";
+    private final PermissionMapper permissionMapper;
 
-    public void inject(Set<String> permissions, Map<String, String> rowRules) {
-        injectSystemPermissions(permissions);
-        injectSystemRowRules(rowRules);
-    }
+    public String inject(String businessRule, String permCode) {
+        if (businessRule == null || "1=0".equals(businessRule.trim())) {
+            return "1=0";
+        }
 
-    private void injectSystemPermissions(Set<String> permissions) {
-        permissions.add("system:health:read");
-        permissions.add("system:status:read");
-    }
+        Permission permission = permissionMapper.selectOne(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Permission>()
+                        .eq(Permission::getPermissionCode, permCode)
+        );
 
-    private void injectSystemRowRules(Map<String, String> rowRules) {
-        rowRules.putIfAbsent("system:config", "1=1");
-    }
+        if (permission == null || permission.getMandatoryRowRuleTemplate() == null
+                || permission.getMandatoryRowRuleTemplate().isEmpty()
+        //        || "1=1".equals(permission.getMandatoryRowRuleTemplate().trim())
+        ) {
+            return businessRule;
+        }
 
-    public boolean isMandatoryPermission(String permission) {
-        return permission != null && permission.startsWith("system:");
+        return "(" + businessRule + ") AND (" + permission.getMandatoryRowRuleTemplate() + ")";
     }
 }

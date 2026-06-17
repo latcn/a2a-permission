@@ -1,6 +1,8 @@
 package io.github.latcn.a2a.permission.admin.engine;
 
 import io.github.latcn.a2a.permission.admin.entity.Permission;
+import io.github.latcn.a2a.permission.admin.mapper.PermissionMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -12,19 +14,25 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class WildcardExpander {
 
     private static final Pattern WILDCARD_PATTERN = Pattern.compile("[*?]");
 
+    private final PermissionMapper permissionMapper;
+
     public Set<String> expand(List<Permission> permissions) {
+        Set<String> allDefinedPerms = new HashSet<>(permissionMapper.selectAllPermissionCodes());
         Set<String> expanded = new HashSet<>();
 
         for (Permission perm : permissions) {
             String permKey = buildPermissionKey(perm);
             if (containsWildcard(permKey)) {
-                expanded.addAll(matchWildcard(permKey, permissions));
+                expanded.addAll(matchWildcard(permKey, allDefinedPerms));
             } else {
-                expanded.add(permKey);
+                if (allDefinedPerms.contains(permKey)) {
+                    expanded.add(permKey);
+                }
             }
         }
 
@@ -32,26 +40,20 @@ public class WildcardExpander {
     }
 
     private String buildPermissionKey(Permission perm) {
-        StringBuilder sb = new StringBuilder();
-       /* if (perm.getNamespace() != null) {
-            sb.append(perm.getNamespace()).append(":");
-        }*/
-        sb.append(perm.getPermissionCode());
-        return sb.toString();
+        return perm.getPermissionCode();
     }
 
     private boolean containsWildcard(String pattern) {
         return WILDCARD_PATTERN.matcher(pattern).find();
     }
 
-    private Set<String> matchWildcard(String pattern, List<Permission> allPermissions) {
+    private Set<String> matchWildcard(String pattern, Set<String> allPermissions) {
         Set<String> matched = new HashSet<>();
         String regex = pattern.replace("*", ".*").replace("?", ".");
 
-        for (Permission perm : allPermissions) {
-            String permKey = buildPermissionKey(perm);
-            if (permKey.matches(regex)) {
-                matched.add(permKey);
+        for (String perm : allPermissions) {
+            if (perm.matches(regex)) {
+                matched.add(perm);
             }
         }
 

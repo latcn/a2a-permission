@@ -7,7 +7,8 @@
         <result column="role_id" property="roleId"/>
         <result column="permission_id" property="permissionId"/>
         <result column="effect" property="effect"/>
-        <result column="row_rule" property="rowRule"/>
+        <result column="row_rule_template" property="rowRuleTemplate"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="created_by" property="createdBy"/>
         <result column="updated_by" property="updatedBy"/>
         <result column="created_at" property="createdAt"/>

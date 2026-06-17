@@ -30,57 +30,53 @@ public class RowRuleMerger {
             Map<String, String> rowRuleMap = rp.getRowRuleTemplate();
 
             for (Map.Entry<String, String> entry : rowRuleMap.entrySet()) {
-                String key = entry.getKey();
+                String table = entry.getKey();
                 String rowRule = entry.getValue();
+                String key = resourceType + ":" + table;
 
                 rulesByResource.computeIfAbsent(key, k -> new ArrayList<>())
-                        .add(new RowRuleEntry(role.getPriority(), rp.getEffect(), rowRule));
+                        .add(new RowRuleEntry(role.getPriority(), rp.getEffect(), rowRule, resourceType, table));
             }
         }
 
         Map<String, String> mergedRules = new HashMap<>();
 
         for (Map.Entry<String, List<RowRuleEntry>> entry : rulesByResource.entrySet()) {
-            String resourceType = entry.getKey();
             List<RowRuleEntry> rules = entry.getValue();
 
             rules.sort(Comparator.comparingInt((RowRuleEntry r) -> r.priority).reversed());
 
-            StringBuilder merged = new StringBuilder();
-            boolean hasDeny = false;
-            boolean hasAllow = false;
+            List<String> allowRules = new ArrayList<>();
+            List<String> denyRules = new ArrayList<>();
 
             for (RowRuleEntry rule : rules) {
                 if (rule.effect == Effect.DENY.getCode()) {
-                    hasDeny = true;
+                    denyRules.add(rule.rowRule);
                 } else {
-                    hasAllow = true;
+                    allowRules.add(rule.rowRule);
                 }
             }
 
-            if (hasDeny) {
-                for (RowRuleEntry rule : rules) {
-                    if (rule.effect == Effect.DENY.getCode()) {
-                        if (merged.length() > 0) {
-                            merged.append(" AND ");
-                        }
-                        merged.append("(").append(rule.rowRule).append(")");
-                    }
-                }
+            String allowPart = allowRules.stream()
+                    .map(r -> "(" + r + ")")
+                    .collect(Collectors.joining(" OR "));
+
+            String denyPart = denyRules.stream()
+                    .map(r -> "(" + r + ")")
+                    .collect(Collectors.joining(" OR "));
+
+            String merged;
+            if (!allowRules.isEmpty() && !denyRules.isEmpty()) {
+                merged = "(" + allowPart + ") AND NOT (" + denyPart + ")";
+            } else if (!allowRules.isEmpty()) {
+                merged = allowPart;
+            } else if (!denyRules.isEmpty()) {
+                merged = "NOT (" + denyPart + ")";
+            } else {
+                merged = "";
             }
 
-            if (hasAllow) {
-                for (RowRuleEntry rule : rules) {
-                    if (rule.effect == Effect.ALLOW.getCode()) {
-                        if (merged.length() > 0) {
-                            merged.append(" AND ");
-                        }
-                        merged.append("(").append(rule.rowRule).append(")");
-                    }
-                }
-            }
-
-            mergedRules.put(resourceType, merged.toString());
+            mergedRules.put(entry.getKey(), merged);
         }
 
         return mergedRules;
@@ -90,11 +86,15 @@ public class RowRuleMerger {
         final int priority;
         final int effect;
         final String rowRule;
+        final String resourceType;
+        final String table;
 
-        RowRuleEntry(int priority, int effect, String rowRule) {
+        RowRuleEntry(int priority, int effect, String rowRule, String resourceType, String table) {
             this.priority = priority;
             this.effect = effect;
             this.rowRule = rowRule;
+            this.resourceType = resourceType;
+            this.table = table;
         }
     }
 }
