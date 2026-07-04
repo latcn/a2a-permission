@@ -1,8 +1,8 @@
 package io.github.latcn.a2a.permission.admin.engine;
 
-import io.github.latcn.a2a.permission.admin.entity.Role;
-import io.github.latcn.a2a.permission.admin.entity.Permission;
-import io.github.latcn.a2a.permission.admin.entity.RolePermission;
+import io.github.latcn.a2a.permission.admin.domain.entity.Role;
+import io.github.latcn.a2a.permission.admin.domain.entity.Permission;
+import io.github.latcn.a2a.permission.admin.domain.entity.RolePermission;
 import io.github.latcn.a2a.permission.api.enums.Effect;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

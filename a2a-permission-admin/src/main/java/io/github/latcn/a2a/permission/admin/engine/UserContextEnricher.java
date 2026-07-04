@@ -1,9 +1,9 @@
 package io.github.latcn.a2a.permission.admin.engine;
 
-import io.github.latcn.a2a.permission.admin.entity.Department;
-import io.github.latcn.a2a.permission.admin.entity.User;
-import io.github.latcn.a2a.permission.admin.mapper.DepartmentMapper;
-import io.github.latcn.a2a.permission.admin.mapper.UserMapper;
+import io.github.latcn.a2a.permission.admin.domain.entity.Department;
+import io.github.latcn.a2a.permission.admin.domain.entity.User;
+import io.github.latcn.a2a.permission.admin.infra.mapper.DepartmentMapper;
+import io.github.latcn.a2a.permission.admin.infra.mapper.UserMapper;
 import io.github.latcn.a2a.permission.api.dto.UserFullPermissionDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

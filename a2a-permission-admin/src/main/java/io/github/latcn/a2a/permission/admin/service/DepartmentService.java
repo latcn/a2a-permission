@@ -1,8 +1,8 @@
 package io.github.latcn.a2a.permission.admin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.github.latcn.a2a.permission.admin.entity.Department;
-import io.github.latcn.a2a.permission.admin.mapper.DepartmentMapper;
+import io.github.latcn.a2a.permission.admin.domain.entity.Department;
+import io.github.latcn.a2a.permission.admin.infra.mapper.DepartmentMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;

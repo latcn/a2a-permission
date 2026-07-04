@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.latcn.a2a.permission.admin.mapper.PermissionMapper">
+<mapper namespace="io.github.latcn.a2a.permission.admin.infra.mapper.PermissionMapper">
 
-    <resultMap id="BaseResultMap" type="io.github.latcn.a2a.permission.admin.entity.Permission">
+    <resultMap id="BaseResultMap" type="io.github.latcn.a2a.permission.admin.domain.entity.Permission">
         <id column="id" property="id"/>
         <result column="permission_code" property="permissionCode"/>
         <result column="action_code" property="actionCode"/>

@@ -5,6 +5,13 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.3</version>
+        <relativePath/>
+    </parent>
+
     <groupId>io.github.latcn</groupId>
     <artifactId>a2a-permission</artifactId>
     <version>1.0.0</version>
@@ -17,10 +24,11 @@
         <module>a2a-permission-common</module>
         <module>a2a-permission-remote</module>
         <module>a2a-permission-admin</module>
+        <module>cache-examples</module>
     </modules>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -30,11 +38,11 @@
 
         <!-- 核心框架版本 -->
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
-        <rocketmq.version>2.3.2</rocketmq.version>
+        <rocketmq.version>2.3.4</rocketmq.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <circuitbreaker.version>3.1.1</circuitbreaker.version>
         <jsqlparser.version>4.9</jsqlparser.version>
-        <redisson.version>3.40.0</redisson.version>
+        <redisson.version>4.3.0</redisson.version>
         <caffeine.version>3.1.8</caffeine.version>
         <openfeign.version>4.2.1</openfeign.version>
 
@@ -44,6 +52,7 @@
         <commons-codec.version>1.17.1</commons-codec.version>
         <commons-pool2.version>2.12.1</commons-pool2.version>
         <mysql-connector.version>8.0.33</mysql-connector.version>
+        <consistency-cache.version>1.0.5</consistency-cache.version>
 
         <!-- 插件版本 -->
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
@@ -67,6 +76,14 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.latcn</groupId>
+                <artifactId>consistency-cache-bom</artifactId>
+                <version>${consistency-cache.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

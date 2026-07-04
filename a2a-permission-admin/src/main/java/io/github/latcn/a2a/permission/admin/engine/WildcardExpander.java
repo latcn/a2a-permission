@@ -1,7 +1,7 @@
 package io.github.latcn.a2a.permission.admin.engine;
 
-import io.github.latcn.a2a.permission.admin.entity.Permission;
-import io.github.latcn.a2a.permission.admin.mapper.PermissionMapper;
+import io.github.latcn.a2a.permission.admin.domain.entity.Permission;
+import io.github.latcn.a2a.permission.admin.infra.mapper.PermissionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j

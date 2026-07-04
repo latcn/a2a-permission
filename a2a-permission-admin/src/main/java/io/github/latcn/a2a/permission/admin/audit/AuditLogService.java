@@ -1,8 +1,8 @@
 package io.github.latcn.a2a.permission.admin.audit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.latcn.a2a.permission.admin.entity.AuditLog;
-import io.github.latcn.a2a.permission.admin.mapper.AuditLogMapper;
+import io.github.latcn.a2a.permission.admin.domain.entity.AuditLog;
+import io.github.latcn.a2a.permission.admin.infra.mapper.AuditLogMapper;
 import io.github.latcn.a2a.permission.api.dto.AuditLogDTO;
 import io.github.latcn.a2a.permission.api.enums.OperationType;
 import lombok.RequiredArgsConstructor;
