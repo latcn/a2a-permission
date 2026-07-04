@@ -1,6 +1,6 @@
 package io.github.latcn.a2a.permission.remote.fallback;
 
-import io.github.latcn.a2a.permission.api.dto.AclCheckResult;
+import io.github.latcn.a2a.permission.api.dto.AclCheckResultDTO;
 import io.github.latcn.a2a.permission.api.dto.AgentDTO;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareRequest;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareResponse;
@@ -46,7 +46,7 @@ public class PermissionQueryFallbackFactory implements org.springframework.cloud
             }
 
             @Override
-            public AclCheckResult checkAcl(String sourceClientId, String targetClientId) {
+            public AclCheckResultDTO checkAcl(String sourceClientId, String targetClientId) {
                 log.warn("Fallback triggered for checkAcl: source={}, target={} - Error: {}",
                         sourceClientId, targetClientId, cause.getMessage());
                 return tryGetAclFromCache(sourceClientId, targetClientId);
@@ -70,12 +70,12 @@ public class PermissionQueryFallbackFactory implements org.springframework.cloud
                 }
             }
 
-            private AclCheckResult tryGetAclFromCache(String sourceClientId, String targetClientId) {
+            private AclCheckResultDTO tryGetAclFromCache(String sourceClientId, String targetClientId) {
                 try {
                     return getAclCheckResult(sourceClientId, targetClientId);
                 } catch (Exception e) {
                     log.error("Failed to get ACL from cache", e);
-                    return AclCheckResult.builder()
+                    return AclCheckResultDTO.builder()
                             .allowed(false)
                             .sourceClientId(sourceClientId)
                             .targetClientId(targetClientId)
@@ -84,7 +84,7 @@ public class PermissionQueryFallbackFactory implements org.springframework.cloud
                 }
             }
 
-            private AclCheckResult getAclCheckResult(String sourceClientId, String targetClientId) {
+            private AclCheckResultDTO getAclCheckResult(String sourceClientId, String targetClientId) {
                 return null;
             }
         };

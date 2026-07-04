@@ -10,6 +10,6 @@ public interface PermissionQueryService {
 
     AgentDTO getAgent(String clientId);
 
-    AclCheckResult checkAcl(String sourceClientId, String targetClientId);
+    AclCheckResultDTO checkAcl(String sourceClientId, String targetClientId);
 
 }

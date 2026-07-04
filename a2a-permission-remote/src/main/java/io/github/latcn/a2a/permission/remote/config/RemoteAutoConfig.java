@@ -1,7 +1,7 @@
 package io.github.latcn.a2a.permission.remote.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.latcn.a2a.permission.api.dto.AclCheckResult;
+import io.github.latcn.a2a.permission.api.dto.AclCheckResultDTO;
 import io.github.latcn.a2a.permission.api.dto.AgentDTO;
 import io.github.latcn.a2a.permission.api.dto.UserFullPermissionDTO;
 import io.github.latcn.a2a.permission.api.service.PermissionQueryService;
@@ -76,7 +76,7 @@ public class RemoteAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public LocalCacheManager<String, AclCheckResult> aclLocalCache(CacheConfig cacheConfig) {
+    public LocalCacheManager<String, AclCheckResultDTO> aclLocalCache(CacheConfig cacheConfig) {
         return new LocalCacheManager<>("aclCache", cacheConfig, 
                 key -> null);
     }
@@ -94,7 +94,7 @@ public class RemoteAutoConfig {
             RemotePermissionQueryService remotePermissionQueryService,
             LocalCacheManager<Long, UserFullPermissionDTO> userPermissionCache,
             LocalCacheManager<String, AgentDTO> agentCache,
-            LocalCacheManager<String, AclCheckResult> aclCache,
+            LocalCacheManager<String, AclCheckResultDTO> aclCache,
             RedisCacheManager redisCacheManager,
             UserVersionCache userVersionCache,
             RoleVersionCache roleVersionCache,

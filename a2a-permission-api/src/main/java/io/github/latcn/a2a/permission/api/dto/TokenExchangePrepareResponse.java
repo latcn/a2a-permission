@@ -18,5 +18,5 @@ public class TokenExchangePrepareResponse {
     private Map<String, String> rowRules;
     private List<RoleInfo> roles;
     private AgentDTO agent;
-    private AclCheckResult aclResult;
+    private AclCheckResultDTO aclResult;
 }

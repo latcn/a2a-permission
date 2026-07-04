@@ -11,7 +11,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
     private final PermissionQueryService delegate;
     private final LocalCacheManager<Long, UserFullPermissionDTO> userPermissionCache;
     private final LocalCacheManager<String, AgentDTO> agentCache;
-    private final LocalCacheManager<String, AclCheckResult> aclCache;
+    private final LocalCacheManager<String, AclCheckResultDTO> aclCache;
     private final RedisCacheManager redisCacheManager;
     private final UserVersionCache userVersionCache;
     private final RoleVersionCache roleVersionCache;
@@ -21,7 +21,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
             PermissionQueryService delegate,
             LocalCacheManager<Long, UserFullPermissionDTO> userPermissionCache,
             LocalCacheManager<String, AgentDTO> agentCache,
-            LocalCacheManager<String, AclCheckResult> aclCache,
+            LocalCacheManager<String, AclCheckResultDTO> aclCache,
             RedisCacheManager redisCacheManager,
             UserVersionCache userVersionCache,
             RoleVersionCache roleVersionCache,
@@ -80,7 +80,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
     }
 
     @Override
-    public AclCheckResult checkAcl(String sourceClientId, String targetClientId) {
+    public AclCheckResultDTO checkAcl(String sourceClientId, String targetClientId) {
         if (!cacheConfig.isEnableLocalCache()) {
             return delegate.checkAcl(sourceClientId, targetClientId);
         }
@@ -174,8 +174,8 @@ public class CachedPermissionQueryService implements PermissionQueryService {
         return result;
     }
 
-    private AclCheckResult loadAclCheckResult(String sourceClientId, String targetClientId) {
-        AclCheckResult result = delegate.checkAcl(sourceClientId, targetClientId);
+    private AclCheckResultDTO loadAclCheckResult(String sourceClientId, String targetClientId) {
+        AclCheckResultDTO result = delegate.checkAcl(sourceClientId, targetClientId);
         
         if (result != null && cacheConfig.isEnableRedisCache()) {
             String redisKey = CacheConstants.buildAclKey(sourceClientId, targetClientId);

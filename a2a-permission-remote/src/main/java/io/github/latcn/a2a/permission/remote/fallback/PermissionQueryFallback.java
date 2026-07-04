@@ -1,6 +1,6 @@
 package io.github.latcn.a2a.permission.remote.fallback;
 
-import io.github.latcn.a2a.permission.api.dto.AclCheckResult;
+import io.github.latcn.a2a.permission.api.dto.AclCheckResultDTO;
 import io.github.latcn.a2a.permission.api.dto.AgentDTO;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareRequest;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareResponse;
@@ -71,13 +71,13 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
     }
 
     @Override
-    public AclCheckResult checkAcl(String sourceClientId, String targetClientId) {
+    public AclCheckResultDTO checkAcl(String sourceClientId, String targetClientId) {
         log.warn("Fallback: checkAcl called for source: {}, target: {}, attempting to retrieve from Redis cache", 
                 sourceClientId, targetClientId);
         
         try {
             String redisKey = CacheConstants.buildAclKey(sourceClientId, targetClientId);
-            AclCheckResult cached = redisCacheManager.get(redisKey, AclCheckResult.class);
+            AclCheckResultDTO cached = redisCacheManager.get(redisKey, AclCheckResultDTO.class);
             
             if (cached != null) {
                 log.info("Fallback: Successfully retrieved ACL from Redis cache for source: {}, target: {}", 
@@ -92,7 +92,7 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
                     sourceClientId, targetClientId, e);
         }
         
-        return AclCheckResult.builder()
+        return AclCheckResultDTO.builder()
                 .allowed(false)
                 .sourceClientId(sourceClientId)
                 .targetClientId(targetClientId)

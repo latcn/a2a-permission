@@ -1,6 +1,6 @@
 package io.github.latcn.a2a.permission.remote.client;
 
-import io.github.latcn.a2a.permission.api.dto.AclCheckResult;
+import io.github.latcn.a2a.permission.api.dto.AclCheckResultDTO;
 import io.github.latcn.a2a.permission.api.dto.AgentDTO;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareRequest;
 import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareResponse;
@@ -28,6 +28,6 @@ public interface RemotePermissionQueryService {
     AgentDTO getAgent(@PathVariable("clientId") String clientId);
 
     @GetMapping("/api/v1/permission/acl/{sourceClientId}/{targetClientId}")
-    AclCheckResult checkAcl(@PathVariable("sourceClientId") String sourceClientId,
-                            @PathVariable("targetClientId") String targetClientId);
+    AclCheckResultDTO checkAcl(@PathVariable("sourceClientId") String sourceClientId,
+                               @PathVariable("targetClientId") String targetClientId);
 }
