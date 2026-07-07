@@ -6,7 +6,6 @@ import io.github.latcn.a2a.permission.admin.domain.audit.AuditLogService;
 import io.github.latcn.a2a.permission.admin.domain.messaging.PermissionChangePublisher;
 import io.github.latcn.a2a.permission.admin.domain.model.*;
 import io.github.latcn.a2a.permission.admin.domain.repository.*;
-import io.github.latcn.a2a.permission.admin.infrastructure.security.RowRulePreparedBinder;
 import io.github.latcn.a2a.permission.admin.infrastructure.security.RowRuleValidator;
 import io.github.latcn.a2a.permission.api.dto.PermissionChangeMessage;
 import io.github.latcn.a2a.permission.api.enums.ChangeType;
@@ -38,7 +37,6 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
     private final AuditLogService auditLogService;
     private final PermissionChangePublisher permissionChangePublisher;
     private final RowRuleValidator rowRuleValidator;
-    private final RowRulePreparedBinder rowRulePreparedBinder;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -52,7 +50,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
         try {
             Optional<Role> roleOpt = roleRepository.findById(roleId);
             if (roleOpt.isEmpty()) {
-                log.warn("Role not found: {}", roleId);
+                log.warn("grantRole Role not found: {}", roleId);
                 return GrantRoleRespDTO.builder()
                         .success(false)
                         .roleId(roleId)
@@ -93,7 +91,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to grant role", e);
+            log.error("grantRole Failed to grant role", e);
             recordAudit(traceId, operatorId, null, userIds, OperationType.ROLE_GRANT, OperationResult.FAILED, null);
             return GrantRoleRespDTO.builder()
                     .success(false)
@@ -115,7 +113,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
         try {
             Optional<Role> roleOpt = roleRepository.findById(roleId);
             if (roleOpt.isEmpty()) {
-                log.warn("Role not found: {}", roleId);
+                log.warn("revokeRole Role not found: {}", roleId);
                 return RevokeRoleRespDTO.builder()
                         .success(false)
                         .roleId(roleId)
@@ -153,7 +151,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to revoke role", e);
+            log.error("revokeRole Failed to revoke role", e);
             recordAudit(traceId, operatorId, null, userIds, OperationType.ROLE_REVOKE, OperationResult.FAILED, null);
             return RevokeRoleRespDTO.builder()
                     .success(false)
@@ -175,7 +173,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
         try {
             Optional<Role> roleOpt = roleRepository.findById(roleId);
             if (roleOpt.isEmpty()) {
-                log.warn("Role not found: {}", roleId);
+                log.warn("grantPermission Role not found: {}", roleId);
                 return GrantPermissionRespDTO.builder()
                         .success(false)
                         .roleId(roleId)
@@ -214,7 +212,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to grant permission", e);
+            log.error("grantPermission Failed to grant permission", e);
             recordAudit(traceId, operatorId, null, null, OperationType.PERM_GRANT, OperationResult.FAILED, null);
             return GrantPermissionRespDTO.builder()
                     .success(false)
@@ -237,7 +235,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
         try {
             RowRuleValidator.ValidationResult validation = rowRuleValidator.validate(newRowRule);
             if (!validation.isValid()) {
-                log.warn("Row rule validation failed: {}", validation.getMessage());
+                log.warn("updateRowRule Row rule validation failed: {}", validation.getMessage());
                 return UpdateRowRuleRespDTO.builder()
                         .success(false)
                         .roleId(roleId)
@@ -248,7 +246,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
 
             Optional<RolePermission> rpOpt = rolePermissionRepository.findByRoleIdAndPermissionId(roleId, permissionId);
             if (rpOpt.isEmpty()) {
-                log.warn("RolePermission not found: roleId={}, permissionId={}", roleId, permissionId);
+                log.warn("updateRowRule RolePermission not found: roleId={}, permissionId={}", roleId, permissionId);
                 return UpdateRowRuleRespDTO.builder()
                         .success(false)
                         .roleId(roleId)
@@ -299,7 +297,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to update row rule", e);
+            log.error("updateRowRule Failed to update row rule", e);
             recordAudit(traceId, operatorId, null, null, OperationType.ROW_RULE_UPDATE, OperationResult.FAILED, null);
             return UpdateRowRuleRespDTO.builder()
                     .success(false)
@@ -334,7 +332,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to create role", e);
+            log.error("createRole Failed to create role", e);
             recordAudit(traceId, operatorId, null, null, OperationType.ROLE_CREATE, OperationResult.FAILED, null);
             return CreateRoleRespDTO.builder()
                     .success(false)
@@ -354,7 +352,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
         try {
             Optional<Role> roleOpt = roleRepository.findById(roleId);
             if (roleOpt.isEmpty()) {
-                log.warn("Role not found: {}", roleId);
+                log.warn("deleteRole Role not found: {}", roleId);
                 return DeleteRoleRespDTO.builder()
                         .success(false)
                         .roleId(roleId)
@@ -385,7 +383,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to delete role", e);
+            log.error("deleteRole Failed to delete role", e);
             recordAudit(traceId, operatorId, roleId, null, OperationType.ROLE_DELETE, OperationResult.FAILED, null);
             return DeleteRoleRespDTO.builder()
                     .success(false)
@@ -417,7 +415,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to create permission", e);
+            log.error("createPermission Failed to create permission", e);
             recordAudit(traceId, operatorId, null, null, OperationType.PERM_CREATE, OperationResult.FAILED, null);
             return CreatePermissionRespDTO.builder()
                     .success(false)
@@ -437,7 +435,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
         try {
             Optional<Permission> permissionOpt = permissionRepository.findById(permissionId);
             if (permissionOpt.isEmpty()) {
-                log.warn("Permission not found: {}", permissionId);
+                log.warn("deletePermission Permission not found: {}", permissionId);
                 return DeletePermissionRespDTO.builder()
                         .success(false)
                         .permissionId(permissionId)
@@ -457,7 +455,7 @@ public class PermissionAdminServiceImpl implements PermissionAdminService {
                     .build();
 
         } catch (Exception e) {
-            log.error("Failed to delete permission", e);
+            log.error("deletePermission Failed to delete permission", e);
             recordAudit(traceId, operatorId, null, null, OperationType.PERM_DELETE, OperationResult.FAILED, null);
             return DeletePermissionRespDTO.builder()
                     .success(false)

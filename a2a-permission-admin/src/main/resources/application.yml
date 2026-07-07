@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/a2a-permission?serverTimezone=UTC&characterEncoding=utf8
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 2000ms
+
+mybatis-plus:
+  mapper-locations: classpath*:/mappers/**/*.xml
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    group: my-producer-group
+
+archbase:
+  enabled: true
+  application-name: archbase-example
+  
+  cqrs:
+    enabled: true
+    mode: memory
+  
+  mybatis:
+    enabled: true
+    auto-fill: true
+  
+  web:
+    enabled: true
+    exception-handler: default

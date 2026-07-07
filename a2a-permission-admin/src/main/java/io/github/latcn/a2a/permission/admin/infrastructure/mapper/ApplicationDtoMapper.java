@@ -9,25 +9,28 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 @Mapper(componentModel = "spring")
 public interface ApplicationDtoMapper {
 
     @Mapping(target = "operatorId", ignore = true)
     GrantRoleReqDTO toGrantRoleReqDTO(GrantRoleReqDTO req);
 
-    @Mapping(target = "roleId", source = "role.id")
     GrantRoleRespDTO toGrantRoleRespDTO(GrantRoleRespDTO resp);
 
     @Mapping(target = "operatorId", ignore = true)
     RevokeRoleReqDTO toRevokeRoleReqDTO(RevokeRoleReqDTO req);
 
-    @Mapping(target = "roleId", source = "role.id")
+   
     RevokeRoleRespDTO toRevokeRoleRespDTO(RevokeRoleRespDTO resp);
 
     @Mapping(target = "operatorId", ignore = true)
     GrantPermissionReqDTO toGrantPermissionReqDTO(GrantPermissionReqDTO req);
 
-    @Mapping(target = "roleId", source = "role.id")
+   
     GrantPermissionRespDTO toGrantPermissionRespDTO(GrantPermissionRespDTO resp);
 
     @Mapping(target = "operatorId", ignore = true)
@@ -38,14 +41,14 @@ public interface ApplicationDtoMapper {
     @Mapping(target = "operatorId", ignore = true)
     CreateRoleReqDTO toCreateRoleReqDTO(CreateRoleReqDTO req);
 
-    @Mapping(target = "roleId", source = "role.id")
+   
     @Mapping(target = "roleName", source = "role.roleName")
     CreateRoleRespDTO toCreateRoleRespDTO(Role role, Boolean success, String message);
 
     @Mapping(target = "operatorId", ignore = true)
     DeleteRoleReqDTO toDeleteRoleReqDTO(DeleteRoleReqDTO req);
 
-    @Mapping(target = "roleId", source = "role.id")
+   
     DeleteRoleRespDTO toDeleteRoleRespDTO(Role role, Boolean success, String message);
 
     @Mapping(target = "operatorId", ignore = true)
@@ -58,6 +61,7 @@ public interface ApplicationDtoMapper {
 
     DeletePermissionRespDTO toDeletePermissionRespDTO(DeletePermissionRespDTO resp);
 
+    @Mapping(target = "capabilities", ignore = true)
     Agent toAgent(RegisterAgentReqDTO req);
 
     @Mapping(target = "agentId", source = "agent.id")
@@ -72,4 +76,12 @@ public interface ApplicationDtoMapper {
     UserRole toUserRole(Long userId, Long roleId);
 
     RolePermission toRolePermission(Long roleId, Long permissionId, Integer effect);
+
+    // 自定义转换方法：将 String 转换为 Set<String>
+    default Set<String> map(String value) {
+        if (value == null) {
+            return null;
+        }
+        return new HashSet<>(Arrays.asList(value.split(",")));
+    }
 }

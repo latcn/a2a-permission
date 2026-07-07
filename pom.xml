@@ -34,7 +34,7 @@
 
         <!-- Spring Boot 3.x 相关版本 -->
         <spring-boot.version>3.5.3</spring-boot.version>
-        <spring-cloud.version>2024.0.1</spring-cloud.version>
+        <spring-cloud.version>2025.0.3</spring-cloud.version>
 
         <!-- 核心框架版本 -->
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
@@ -54,6 +54,7 @@
         <commons-pool2.version>2.12.1</commons-pool2.version>
         <mysql-connector.version>8.0.33</mysql-connector.version>
         <consistency-cache.version>1.0.5</consistency-cache.version>
+        <archbase.version>1.0.0</archbase.version>
 
         <!-- 插件版本 -->
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
@@ -85,6 +86,14 @@
                 <groupId>io.github.latcn</groupId>
                 <artifactId>consistency-cache-bom</artifactId>
                 <version>${consistency-cache.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.latcn</groupId>
+                <artifactId>archbase-bom</artifactId>
+                <version>${archbase.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

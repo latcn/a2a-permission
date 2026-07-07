@@ -3,6 +3,7 @@ package io.github.latcn.a2a.permission.remote.service;
 import io.github.latcn.a2a.permission.api.dto.*;
 import io.github.latcn.a2a.permission.api.service.PermissionQueryService;
 import io.github.latcn.a2a.permission.common.cache.*;
+import io.github.latcn.a2a.permission.common.utils.ResultUtil;
 import io.github.latcn.a2a.permission.remote.client.RemotePermissionQueryService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +43,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
     @Override
     public TokenExchangePrepareResponse prepareTokenExchange(TokenExchangePrepareRequest request) {
         log.debug("Preparing token exchange for userId: {}, clientId: {}", request.getUserId(), request.getClientId());
-        return remotePermissionQueryService.prepareTokenExchange(request);
+        return ResultUtil.extractValue(remotePermissionQueryService.prepareTokenExchange(request));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
     public AgentDTO getAgent(String clientId) {
         if (!cacheConfig.isEnableLocalCache()) {
             log.debug("Local cache disabled, fetching agent from remote service for clientId: {}", clientId);
-            return remotePermissionQueryService.getAgent(clientId);
+            return ResultUtil.extractValue(remotePermissionQueryService.getAgent(clientId));
         }
 
         try {
@@ -83,7 +84,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
                     key -> loadAgent(key)).join();
         } catch (Exception e) {
             log.error("Failed to get agent from cache for clientId: {}", clientId, e);
-            return remotePermissionQueryService.getAgent(clientId);
+            return ResultUtil.extractValue(remotePermissionQueryService.getAgent(clientId));
         }
     }
 
@@ -92,7 +93,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
         if (!cacheConfig.isEnableLocalCache()) {
             log.debug("Local cache disabled, checking ACL from remote service for source: {}, target: {}", 
                     sourceClientId, targetClientId);
-            return remotePermissionQueryService.checkAcl(sourceClientId, targetClientId);
+            return ResultUtil.extractValue(remotePermissionQueryService.checkAcl(sourceClientId, targetClientId));
         }
 
         String cacheKey = CacheConstants.buildAclKey(sourceClientId, targetClientId);
@@ -102,7 +103,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
         } catch (Exception e) {
             log.error("Failed to check ACL from cache for source: {}, target: {}", 
                     sourceClientId, targetClientId, e);
-            return remotePermissionQueryService.checkAcl(sourceClientId, targetClientId);
+            return ResultUtil.extractValue(remotePermissionQueryService.checkAcl(sourceClientId, targetClientId));
         }
     }
 
@@ -158,7 +159,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
 
     private UserFullPermissionDTO loadUserFullPermissions(Long userId) {
         log.debug("Loading user permissions from remote service for userId: {}", userId);
-        UserFullPermissionDTO result = remotePermissionQueryService.getUserFullPermissions(userId);
+        UserFullPermissionDTO result = ResultUtil.extractValue(remotePermissionQueryService.getUserFullPermissions(userId));
         
         if (result != null && cacheConfig.isEnableRedisCache()) {
             String redisKey = CacheConstants.buildUserPermissionKey(userId);
@@ -176,7 +177,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
 
     private AgentDTO loadAgent(String clientId) {
         log.debug("Loading agent from remote service for clientId: {}", clientId);
-        AgentDTO result = remotePermissionQueryService.getAgent(clientId);
+        AgentDTO result = ResultUtil.extractValue(remotePermissionQueryService.getAgent(clientId));
         
         if (result != null && cacheConfig.isEnableRedisCache()) {
             String redisKey = CacheConstants.buildAgentKey(clientId);
@@ -188,7 +189,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
 
     private AclCheckResultDTO loadAclCheckResult(String sourceClientId, String targetClientId) {
         log.debug("Loading ACL from remote service for source: {}, target: {}", sourceClientId, targetClientId);
-        AclCheckResultDTO result = remotePermissionQueryService.checkAcl(sourceClientId, targetClientId);
+        AclCheckResultDTO result = ResultUtil.extractValue(remotePermissionQueryService.checkAcl(sourceClientId, targetClientId));
         
         if (result != null && cacheConfig.isEnableRedisCache()) {
             String redisKey = CacheConstants.buildAclKey(sourceClientId, targetClientId);
@@ -200,7 +201,7 @@ public class CachedPermissionQueryService implements PermissionQueryService {
 
     private UserFullPermissionDTO fetchFromRemote(Long userId) {
         try {
-            return remotePermissionQueryService.getUserFullPermissions(userId);
+            return ResultUtil.extractValue(remotePermissionQueryService.getUserFullPermissions(userId));
         } catch (Exception e) {
             log.error("Failed to fetch user permissions from remote service for userId: {}", userId, e);
             return null;

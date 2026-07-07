@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.latcn.a2a.permission.admin.infra.mapper.AuditLogMapper">
 
-    <resultMap id="BaseResultMap" type="io.github.latcn.a2a.permission.admin.domain.entity.AuditLog">
+    <resultMap id="BaseResultMap" type="io.github.latcn.a2a.permission.admin.infrastructure.persistence.entity.AuditLogDO">
         <id column="id" property="id"/>
         <result column="trace_id" property="traceId"/>
         <result column="operation_type" property="operationType"/>

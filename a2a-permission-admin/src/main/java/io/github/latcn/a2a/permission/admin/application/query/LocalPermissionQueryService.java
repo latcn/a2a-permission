@@ -10,9 +10,13 @@ import io.github.latcn.a2a.permission.api.service.PermissionQueryService;
 import io.github.latcn.cache.spring.annotation.HccCacheable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -21,17 +25,60 @@ public class LocalPermissionQueryService implements PermissionQueryService {
 
     private final AgentRepository agentRepository;
     private final A2AAclRepository a2AAclRepository;
-    private final PermissionCalculator permissionCalculator;
+
+    @Lazy
+    @Autowired
+    private PermissionCalculator permissionCalculator;
 
     @Override
     public TokenExchangePrepareResponse prepareTokenExchange(TokenExchangePrepareRequest request) {
         log.debug("Preparing token exchange for request: {}", request);
+
+        AclCheckResultDTO aclResult = checkAcl(request.getClientId(), request.getTargetAgent());
+        if (!aclResult.isAllowed()) {
+            log.warn("ACL check failed for {} -> {}, denying token exchange", request.getClientId(), request.getTargetAgent());
+            return TokenExchangePrepareResponse.builder()
+                    .userId(request.getUserId())
+                    .aclResult(aclResult)
+                    .permissions(Collections.emptySet())
+                    .rowRules(Collections.emptyMap())
+                    .roles(Collections.emptyList())
+                    .build();
+        }
 
         UserFullPermissionDTO fullPerm = permissionCalculator.calculateFullPermissions(request.getUserId());
         if (fullPerm == null) {
             log.warn("User not found or has no permissions: userId={}", request.getUserId());
             return TokenExchangePrepareResponse.builder()
                     .userId(request.getUserId())
+                    .aclResult(aclResult)
+                    .permissions(Collections.emptySet())
+                    .rowRules(Collections.emptyMap())
+                    .roles(Collections.emptyList())
+                    .build();
+        }
+
+        Set<String> userPermissions = fullPerm.getPermissions();
+        Set<String> requestedScopes = request.getRequestedScopes();
+
+        Set<String> grantedPermissions = new java.util.HashSet<>();
+        if (userPermissions != null && requestedScopes != null) {
+            for (String scope : requestedScopes) {
+                if (userPermissions.contains(scope)) {
+                    grantedPermissions.add(scope);
+                }
+            }
+        }
+
+        if (grantedPermissions.isEmpty()) {
+            log.warn("No matching permissions for user {} with requested scopes {}", request.getUserId(), requestedScopes);
+            return TokenExchangePrepareResponse.builder()
+                    .userId(fullPerm.getUserId())
+                    .username(fullPerm.getUsername())
+                    .aclResult(aclResult)
+                    .permissions(Collections.emptySet())
+                    .rowRules(Collections.emptyMap())
+                    .roles(Collections.emptyList())
                     .build();
         }
 
@@ -39,9 +86,10 @@ public class LocalPermissionQueryService implements PermissionQueryService {
                 .userId(fullPerm.getUserId())
                 .username(fullPerm.getUsername())
                 .combinedVersion(fullPerm.getCombinedVersion())
-                .permissions(fullPerm.getPermissions())
+                .permissions(grantedPermissions)
                 .rowRules(fullPerm.getRowRules())
                 .roles(fullPerm.getRoles())
+                .aclResult(aclResult)
                 .build();
     }
 

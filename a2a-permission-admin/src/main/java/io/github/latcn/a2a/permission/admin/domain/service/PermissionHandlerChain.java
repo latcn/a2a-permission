@@ -1,21 +1,21 @@
 package io.github.latcn.a2a.permission.admin.domain.service;
 
 import io.github.latcn.a2a.permission.api.dto.UserFullPermissionDTO;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
+@Slf4j
 public class PermissionHandlerChain {
 
     private final PermissionCalculateHandler firstHandler;
 
+    @Autowired
     public PermissionHandlerChain(DataLoadHandler dataLoadHandler,
-                                   ValidationHandler validationHandler,
-                                   RowRuleProcessHandler rowRuleProcessHandler,
-                                   VersionCalculateHandler versionCalculateHandler) {
+                                  ValidationHandler validationHandler,
+                                  RowRuleProcessHandler rowRuleProcessHandler,
+                                  VersionCalculateHandler versionCalculateHandler) {
         dataLoadHandler.setNext(validationHandler);
         validationHandler.setNext(rowRuleProcessHandler);
         rowRuleProcessHandler.setNext(versionCalculateHandler);

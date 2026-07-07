@@ -1,18 +1,14 @@
 package io.github.latcn.a2a.permission.remote.fallback;
 
-import io.github.latcn.a2a.permission.api.dto.AclCheckResultDTO;
-import io.github.latcn.a2a.permission.api.dto.AgentDTO;
-import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareRequest;
-import io.github.latcn.a2a.permission.api.dto.TokenExchangePrepareResponse;
-import io.github.latcn.a2a.permission.api.dto.UserFullPermissionDTO;
+import io.github.latcn.a2a.permission.api.dto.*;
 import io.github.latcn.a2a.permission.common.cache.CacheConstants;
 import io.github.latcn.a2a.permission.common.cache.RedisCacheManager;
 import io.github.latcn.a2a.permission.remote.client.RemotePermissionQueryService;
+import io.github.latcn.a2a.permission.remote.enums.RemoteErrorEnum;
+import io.github.latcn.archbase.foundation.result.Result;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 public class PermissionQueryFallback implements RemotePermissionQueryService {
 
     private final RedisCacheManager redisCacheManager;
@@ -22,14 +18,14 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
     }
 
     @Override
-    public TokenExchangePrepareResponse prepareTokenExchange(TokenExchangePrepareRequest request) {
+    public Result<TokenExchangePrepareResponse> prepareTokenExchange(TokenExchangePrepareRequest request) {
         log.warn("Fallback: prepareTokenExchange called for userId: {}, clientId: {}", 
                 request.getUserId(), request.getClientId());
-        return null;
+        return Result.fail(RemoteErrorEnum.FALL_BACK);
     }
 
     @Override
-    public UserFullPermissionDTO getUserFullPermissions(Long userId) {
+    public Result<UserFullPermissionDTO> getUserFullPermissions(Long userId) {
         log.warn("Fallback: getUserFullPermissions called for userId: {}, attempting to retrieve from Redis cache", userId);
         
         try {
@@ -38,7 +34,7 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
             
             if (cached != null) {
                 log.info("Fallback: Successfully retrieved user permissions from Redis cache for userId: {}", userId);
-                return cached;
+                return Result.success(cached);
             }
             
             log.warn("Fallback: No cached user permissions found in Redis for userId: {}", userId);
@@ -46,11 +42,11 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
             log.error("Fallback: Failed to retrieve user permissions from Redis for userId: {}", userId, e);
         }
         
-        return null;
+        return Result.fail(RemoteErrorEnum.FALL_BACK);
     }
 
     @Override
-    public AgentDTO getAgent(String clientId) {
+    public Result<AgentDTO> getAgent(String clientId) {
         log.warn("Fallback: getAgent called for clientId: {}, attempting to retrieve from Redis cache", clientId);
         
         try {
@@ -59,19 +55,19 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
             
             if (cached != null) {
                 log.info("Fallback: Successfully retrieved agent from Redis cache for clientId: {}", clientId);
-                return cached;
+                return Result.success(cached);
             }
             
             log.warn("Fallback: No cached agent found in Redis for clientId: {}", clientId);
         } catch (Exception e) {
             log.error("Fallback: Failed to retrieve agent from Redis for clientId: {}", clientId, e);
         }
-        
-        return null;
+
+        return Result.fail(RemoteErrorEnum.FALL_BACK);
     }
 
     @Override
-    public AclCheckResultDTO checkAcl(String sourceClientId, String targetClientId) {
+    public Result<AclCheckResultDTO> checkAcl(String sourceClientId, String targetClientId) {
         log.warn("Fallback: checkAcl called for source: {}, target: {}, attempting to retrieve from Redis cache", 
                 sourceClientId, targetClientId);
         
@@ -82,7 +78,7 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
             if (cached != null) {
                 log.info("Fallback: Successfully retrieved ACL from Redis cache for source: {}, target: {}", 
                         sourceClientId, targetClientId);
-                return cached;
+                return Result.success(cached);
             }
             
             log.warn("Fallback: No cached ACL found in Redis for source: {}, target: {}", 
@@ -91,12 +87,7 @@ public class PermissionQueryFallback implements RemotePermissionQueryService {
             log.error("Fallback: Failed to retrieve ACL from Redis for source: {}, target: {}", 
                     sourceClientId, targetClientId, e);
         }
-        
-        return AclCheckResultDTO.builder()
-                .allowed(false)
-                .sourceClientId(sourceClientId)
-                .targetClientId(targetClientId)
-                .reason("Service unavailable and no cache available")
-                .build();
+
+        return Result.fail(RemoteErrorEnum.FALL_BACK);
     }
 }

@@ -12,23 +12,23 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface InterfaceDtoMapper {
 
-    @Mapping(target = "operatorId", constant = "1")
+    @Mapping(target = "operatorId", constant = "1L")
     GrantRoleReqDTO toGrantRoleReqDTO(GrantRoleReq req);
 
     GrantRoleResp toGrantRoleResp(GrantRoleRespDTO resp);
 
-    @Mapping(target = "operatorId", constant = "1")
+    @Mapping(target = "operatorId", constant = "1L")
     RevokeRoleReqDTO toRevokeRoleReqDTO(RevokeRoleReq req);
 
     RevokeRoleResp toRevokeRoleResp(RevokeRoleRespDTO resp);
 
-    @Mapping(target = "operatorId", constant = "1")
+    @Mapping(target = "operatorId", constant = "1L")
     GrantPermissionReqDTO toGrantPermissionReqDTO(GrantPermissionReq req);
 
     GrantPermissionResp toGrantPermissionResp(GrantPermissionRespDTO resp);
 
-    @Mapping(target = "operatorId", constant = "1")
-    @Mapping(target = "newRowRule", source = "rowRule")
+    @Mapping(target = "operatorId", constant = "1L")
+    @Mapping(target = "newRowRule", source = "req.rowRule")
     UpdateRowRuleReqDTO toUpdateRowRuleReqDTO(Long roleId, Long permissionId, UpdateRowRuleReq req);
 
     UpdateRowRuleResp toUpdateRowRuleResp(UpdateRowRuleRespDTO resp);

@@ -21,7 +21,7 @@ public class WildcardExpander {
 
     private final PermissionMapper permissionMapper;
 
-    public Set<String> expand(List<PermissionDO> permissions) {
+    public Set<String> expandOfDO(List<PermissionDO> permissions) {
         Set<String> allDefinedPerms = new HashSet<>(permissionMapper.selectAllPermissionCodes());
         Set<String> expanded = new HashSet<>();
 

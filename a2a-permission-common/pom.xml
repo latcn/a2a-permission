@@ -17,6 +17,16 @@
 
         <dependency>
             <groupId>io.github.latcn</groupId>
+            <artifactId>archbase-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.latcn</groupId>
+            <artifactId>archbase-foundation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.latcn</groupId>
             <artifactId>a2a-permission-api</artifactId>
         </dependency>
 
